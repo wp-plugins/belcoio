@@ -1,0 +1,20 @@
+#belco-widget {
+	position: fixed;
+	bottom: -6px;
+	right: 100px;
+	padding: 6px 12px 12px 12px;
+	min-width: 160px;
+	text-align: center;
+	background-color: #ffd12e;
+	color: #ffffff;
+    border-radius: 3px 3px 0 0;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    transition: all .2s ease-out;
+}
+#belco-widget:hover {
+    bottom: 0;
+}
+#belco-widget form {
+  display: none;
+}
