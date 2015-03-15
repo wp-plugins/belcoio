@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Belco
- * @version 0.3.1
+ * @version 0.3.3
  *
  */
 /* 
 Plugin Name: Belco.io
 Plugin URI: http://www.belco.io
 Description: Telephony for webshops
-Version: 0.3.1
+Version: 0.3.3
 Author: Forwarder B.V.
 Author URI: http://www.forwarder.nl
 License: GPLv2 or later
