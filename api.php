@@ -5,8 +5,9 @@ class Belco_API {
 		$secret = get_option('belco_secret');
 		$protocol = BELCO_USE_SSL ? 'https://' : 'http://';
 		
-		$response = wp_remote_post($protocol . BELCO_HOST . $path, array(
+		$response = wp_remote_post($protocol . BELCO_API_HOST . $path, array(
 			'method' => 'POST',
+			'sslverify' => false,
 			'body' => json_encode($data),
 			'headers' => array(
 				'Content-Type' => 'application/json',
