@@ -4,7 +4,7 @@ Donate link: https://belco.io
 Tags: ecommerce, woocommerce, telephony, customer support, crm
 Requires at least: 3.9.1
 Tested up to: 4.1
-Stable tag: 0.3.1
+Stable tag: 0.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,7 +44,10 @@ Belco.io is currently in beta and signup is invite only. Request an invite at ht
 
 == Changelog ==
 
-= 0.4 =
+= 0.3.2 =
+- Bug fixes
+
+= 0.3.1 =
 - Added correct admin.js file.
 
 = 0.3 =
