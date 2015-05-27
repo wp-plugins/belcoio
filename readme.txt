@@ -3,8 +3,8 @@ Contributors: belco
 Donate link: https://belco.io
 Tags: ecommerce, woocommerce, telephony, customer support, crm
 Requires at least: 3.9.1
-Tested up to: 4.1
-Stable tag: 0.3.4
+Tested up to: 4.2
+Stable tag: 0.3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,6 +43,10 @@ Belco.io is currently in beta and signup is invite only. Request an invite at ht
 1. Customer card, instantly see all customer information when you receive or make a call.
 
 == Changelog ==
+
+= 0.3.4 =
+- Test with latest WP 4.2
+- Some code refactoring
 
 = 0.3.4 =
 - Moved client css to cdn.

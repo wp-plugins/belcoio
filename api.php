@@ -18,6 +18,13 @@ class Belco_API {
 		if ( is_wp_error( $response ) ) {
 		   return $response->get_error_message();
 		}
+    
+    $body = json_decode($response['body']);
+    
+    if ($body->success === false) {
+      return $body->message;
+    }
+    
 		return true;
 	}
 	
