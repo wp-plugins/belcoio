@@ -2,18 +2,20 @@
   <div>
     <h2>Settings</h2>
 
+    <p>Don't have a Belco.io account yet? <a href="https://app.belco.io/signup">Sign-up for free now</a>.</p>
+
     <form id="belco-settings-form" action="options.php" method="post" class="belco-setup">
       <?php @settings_fields('wp_belco'); ?>
       <?php @do_settings_fields('wp_belco'); ?>
-      
+
       <?php settings_errors(); ?>
-      
+
       <table class="form-table">
         <tr valign="top">
           <th scope="row">Shop id</th>
           <td><input type="text" name="belco_shop_id" value="<?php echo esc_attr( get_option('belco_shop_id') ); ?>" class="regular-text" /></td>
         </tr>
-       
+
         <tr valign="top">
           <th scope="row">Secret</th>
           <td>
@@ -22,7 +24,7 @@
           </td>
         </tr>
       </table>
-      
+
       <p class="submit">
         <button type="submit" class="button button-primary">Save changes</button>
       </p>
