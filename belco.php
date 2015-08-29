@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Belco
- * @version 0.3.6
+ * @version 0.3.7
  *
  */
 /*
 Plugin Name: Belco.io
 Plugin URI: http://www.belco.io
 Description: Telephony for webshops
-Version: 0.3.6
+Version: 0.3.7
 Author: Forwarder B.V.
 Author URI: http://www.forwarder.nl
 License: GPLv2 or later
@@ -103,7 +103,7 @@ if(!class_exists('WP_Belco')) {
       register_setting('wp_belco', 'belco_shop_id');
       register_setting('wp_belco', 'belco_secret');
 
-      add_action('pre_update_option_belco_shop_id', array(&$this, 'connect'));
+      add_filter('pre_update_option_belco_secret', array(&$this, 'connect'));
     }
 
     public function enqueue_scripts() {
@@ -217,13 +217,18 @@ if(!class_exists('WP_Belco')) {
       }
     }
 
-    public function connect($shopId) {
-      $result = $this->connector->connect($shopId);
+    /**
+     * Connects the shop to Belco
+     */
+    public function connect($secret, $oldSecret) {
+      $result = $this->connector->connect(get_option('belco_shop_id'), $secret);
 
-      if ($result !== true)
+      if ($result !== true) {
         add_settings_error('belco_shop_id', 'shop-id', $result);
+        return $oldSecret;
+      }
 
-      return $shopId;
+      return $secret;
     }
   }
 
