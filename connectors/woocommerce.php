@@ -2,7 +2,7 @@
 require_once(dirname(dirname(__FILE__)).'/api.php');
 
 class WooCommerceConnector {
-  
+
   public function __construct() {
     // init hooks etc
     $this->wc = WooCommerce::instance();
@@ -10,29 +10,29 @@ class WooCommerceConnector {
     add_action('woocommerce_new_order', array($this, 'sync_order'));
     add_action('woocommerce_order_status_changed', array($this, 'sync_order'));
   }
-  
-  public function connect($shop_id) {
+
+  public function connect($shop_id, $secret) {
     return Belco_API::post('/shops/connect', array(
       'id' => $shop_id,
       'type' => 'woocommerce',
       'url' => get_site_url()
-    ));
+    ), array('secret' => $secret));
   }
-  
+
   public function sync_order($id) {
     $order = $this->get_order($id);
     if ($order) {
       Belco_API::post('/sync/order', $order);
     }
   }
-  
+
   public function get_customers() {
     $users = get_users(array(
       'fields'  => 'ID',
       'role'    => 'customer',
       'orderby' => 'registered'
     ));
-    
+
     $customers = array();
     foreach ($users as $user_id) {
       $customers[] = current($this->get_customer($user_id));
@@ -40,14 +40,14 @@ class WooCommerceConnector {
 
     return $customers;
   }
-  
+
   public function get_customer($id) {
     $user = get_userdata($id);
-    
+
     if (!$user) {
       return null;
     }
-    
+
     $customer = array(
       'id' => $user->ID,
       'email' => $user->user_email,
@@ -59,7 +59,7 @@ class WooCommerceConnector {
     );
     return $customer;
   }
-  
+
   public function get_cart() {
     $items = array();
 
@@ -76,19 +76,19 @@ class WooCommerceConnector {
         );
       }
     }
-    
+
     $cart = array(
       'currency' => get_woocommerce_currency(),
       'total' => $this->wc->cart->total,
       'subtotal' => $this->wc->cart->subtotal,
       'items' => $items
     );
-    
+
     return $cart;
   }
-  
+
   public function get_orders() {
-    
+
   }
 
   public function get_order($id) {
@@ -116,7 +116,7 @@ class WooCommerceConnector {
       )
     );
   }
-  
+
   public function get_order_products($order) {
     return array_map(function($item) {
       return array(
@@ -126,5 +126,5 @@ class WooCommerceConnector {
       );
     }, $order->get_items());
   }
-  
+
 }
