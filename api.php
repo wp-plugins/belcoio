@@ -12,7 +12,6 @@ class Belco_API {
 
 		$response = wp_remote_post($protocol . BELCO_API_HOST . $path, array(
 			'method' => 'POST',
-			'sslverify' => false,
 			'body' => json_encode($data),
 			'headers' => array(
 				'Content-Type' => 'application/json',
