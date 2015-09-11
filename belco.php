@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Belco
- * @version 0.3.8
+ * @version 0.3.9
  *
  */
 /*
 Plugin Name: Belco.io
 Plugin URI: http://www.belco.io
 Description: Telephony for webshops
-Version: 0.3.8
+Version: 0.3.9
 Author: Forwarder B.V.
 Author URI: http://www.forwarder.nl
 License: GPLv2 or later
@@ -133,7 +133,7 @@ if(!class_exists('WP_Belco')) {
 
     public function add_menu()
     {
-      add_menu_page('Belco settings', 'Belco', 'manage_options', 'belco', array(&$this, 'settings_page'), null, 60);
+      add_menu_page('Belco settings', 'Belco', 'manage_options', 'belco', array(&$this, 'settings_page'), null, 58);
     }
 
     /**
