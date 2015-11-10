@@ -1,7 +1,7 @@
 <?php
 class Belco_API {
 
-	public static function post($path, $data, $options) {
+	public static function post($path, $data, $options = array()) {
 		if (!empty($options['secret'])) {
 			$secret = $options['secret'];
 		} else {

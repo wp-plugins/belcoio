@@ -1,14 +1,14 @@
 <?php
 /**
  * @package Belco
- * @version 0.3.9
+ * @version 0.4.0
  *
  */
 /*
 Plugin Name: Belco.io
 Plugin URI: http://www.belco.io
 Description: Telephony for webshops
-Version: 0.3.9
+Version: 0.4.0
 Author: Forwarder B.V.
 Author URI: http://www.forwarder.nl
 License: GPLv2 or later
@@ -157,32 +157,13 @@ if(!class_exists('WP_Belco')) {
           $config['hash'] = hash_hmac("sha256", $user->user_email, $secret);
         }
         $config = array_merge($config, $this->connector->get_customer($user->ID));
-        $config['cart'] = $this->connector->get_cart();
+      }
+
+      if ($cart = $this->connector->get_cart()) {
+        $config['cart'] = $cart;
       }
 
       include(sprintf("%s/templates/widget.php", dirname(__FILE__)));
-    }
-
-    /**
-     * Dashboard page
-     */
-
-    public function dashboard_page()
-    {
-      if ( !current_user_can( 'manage_options' ) )  {
-        wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
-      }
-
-      $installed = $this->installation_complete();
-
-      $shop_id = get_option('belco_shop_id');
-
-      $page = '/';
-      if (!$installed) {
-        $page = '/connect?type=woocommerce';
-      }
-
-      include(sprintf("%s/templates/dashboard.php", dirname(__FILE__)));
     }
 
     /**

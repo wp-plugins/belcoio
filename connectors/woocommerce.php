@@ -7,8 +7,9 @@ class WooCommerceConnector {
     // init hooks etc
     $this->wc = WooCommerce::instance();
 
-    add_action('woocommerce_new_order', array($this, 'sync_order'));
-    add_action('woocommerce_order_status_changed', array($this, 'sync_order'));
+    add_action('woocommerce_thankyou', array($this, 'order_completed'));
+
+    add_filter('woocommerce_api_query_args', array($this, 'api_order_search_custom_fields'), 20, 2);
   }
 
   public function connect($shop_id, $secret) {
@@ -19,26 +20,40 @@ class WooCommerceConnector {
     ), array('secret' => $secret));
   }
 
-  public function sync_order($id) {
-    $order = $this->get_order($id);
-    if ($order) {
-      Belco_API::post('/sync/order', $order);
+  public function order_completed($id) {
+    $customer = $this->get_customer_from_order($id);
+    if ($customer) {
+      Belco_API::post('/sync/customer', $customer);
     }
   }
 
-  public function get_customers() {
-    $users = get_users(array(
-      'fields'  => 'ID',
-      'role'    => 'customer',
-      'orderby' => 'registered'
-    ));
+  public function api_order_search_custom_fields($args, $request_args) {
+    global $wpdb;
 
-    $customers = array();
-    foreach ($users as $user_id) {
-      $customers[] = current($this->get_customer($user_id));
+		if ( empty( $request_args['email'] ) ) {
+			return $args;
+		}
+
+		// Search orders
+		$post_ids = $wpdb->get_col(
+			$wpdb->prepare( "
+				SELECT DISTINCT p1.post_id
+				FROM {$wpdb->postmeta} p1
+				INNER JOIN {$wpdb->postmeta} p2 ON p1.post_id = p2.post_id
+				WHERE
+					( p1.meta_key = '_billing_email' AND p1.meta_value LIKE '%%%s%%' )
+				",
+				esc_attr( $request_args['email'] )
+			)
+		);
+
+    if ( !empty ($args['post__in']) ) {
+      $args['post__in'] = array_unique( array_merge( $args['post__in'], $post_ids ) );
+    } else {
+  		$args['post__in'] = $post_ids;
     }
 
-    return $customers;
+    return $args;
   }
 
   public function get_customer($id) {
@@ -57,10 +72,12 @@ class WooCommerceConnector {
       'country' => get_user_meta($user->ID, 'billing_country', true),
       'city' => get_user_meta($user->ID, 'billing_city', true)
     );
+
     return $customer;
   }
 
   public function get_cart() {
+    $cart = null;
     $items = array();
 
     foreach ( $this->wc->cart->get_cart() as $cart_item_key => $cart_item ) {
@@ -77,54 +94,40 @@ class WooCommerceConnector {
       }
     }
 
-    $cart = array(
-      'currency' => get_woocommerce_currency(),
-      'total' => $this->wc->cart->total,
-      'subtotal' => $this->wc->cart->subtotal,
-      'items' => $items
-    );
+    if (count($items)) {
+      $cart = array(
+        'currency' => get_woocommerce_currency(),
+        'total' => $this->wc->cart->total,
+        'subtotal' => $this->wc->cart->subtotal,
+        'items' => $items
+      );
+    }
 
     return $cart;
   }
 
-  public function get_orders() {
-
-  }
-
-  public function get_order($id) {
+  public function get_customer_from_order($id) {
     $order = new WC_Order($id);
     if (!$order) {
       return null;
     }
-    return array(
-      'id' => $order->id,
-      'note' => $order->customer_note,
-      'number' => $order->get_order_number(),
-      'date' => strtotime($order->order_date),
-      'createdAt' => strtotime($order->order_date),
-      'updatedAt' => strtotime($order->modified_date),
-      'status' => $order->get_status(),
-      'currency' => $order->get_order_currency(),
-      'products' => $order->get_order_products($order),
-      'total' => wc_format_decimal( $order->get_total(), 2 ),
-      'customer' => array(
-        'id' => $order->customer_user,
+
+    if ($order->customer_user) {
+      $customer = $this->get_customer($order->customer_user);
+    } else {
+      $customer = array(
         'email' => $order->billing_email,
         'phoneNumber' => $order->billing_phone,
-        'firstName' => $order->billing_first_name,
-        'lastName' => $order->billing_last_name,
-      )
-    );
-  }
-
-  public function get_order_products($order) {
-    return array_map(function($item) {
-      return array(
-        'name' => $item->name,
-        'quantity' => $item->qty,
-        'price' => $item->line_total
+        'name' => $order->billing_first_name . ' ' . $order->billing_last_name,
+        'country' => $order->billing_country,
+        'city' => $order->billing_city,
       );
-    }, $order->get_items());
+    }
+
+    return array_merge(array(
+      'ipAddress' => $order->customer_ip_address,
+      'userAgent' => $order->customer_user_agent
+    ), $customer);
   }
 
 }
